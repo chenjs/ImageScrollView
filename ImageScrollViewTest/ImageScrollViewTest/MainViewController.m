@@ -20,10 +20,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     self.imageScrollViewController = [[ImageScrollViewController alloc] init];
     self.imageScrollViewController.image = [UIImage imageNamed:@"xiling.jpg"];
     self.imageScrollViewController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
+    //self.imageScrollViewController.view.frame = CGRectMake(0, 0, 320, 480);
     [self.view addSubview:self.imageScrollViewController.view];
 }
 

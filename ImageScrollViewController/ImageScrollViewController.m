@@ -18,7 +18,9 @@
 - (void)scrollViewTwoFingerTapped:(UITapGestureRecognizer*)recognizer;
 @end
 
-@implementation ImageScrollViewController
+@implementation ImageScrollViewController {
+    BOOL isStatusBarHidden;
+}
 
 @synthesize scrollView = _scrollView;
 @synthesize imageView = _imageView;
@@ -42,6 +44,12 @@
     }
     
     self.imageView.frame = contentsFrame;
+}
+
+- (void)scrollViewTapped:(UITapGestureRecognizer *)recognizer
+{
+    [[UIApplication sharedApplication] setStatusBarHidden:(!isStatusBarHidden)];
+    isStatusBarHidden = !isStatusBarHidden;
 }
 
 - (void)scrollViewDoubleTapped:(UITapGestureRecognizer*)recognizer {
@@ -74,6 +82,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
+    isStatusBarHidden = NO;
     
     // Set a nice title
     self.title = @"Image";
@@ -81,8 +91,9 @@
     
     CGRect rectScrollView;
     rectScrollView.origin.x = 0;
-    rectScrollView.origin.y = 0;
+    rectScrollView.origin.y = -20;
     rectScrollView.size = self.view.bounds.size;
+    rectScrollView.size.height += 20;
     
     //rectScrollView = [[UIScreen mainScreen] bounds];
     
@@ -110,10 +121,17 @@
     // Tell the scroll view the size of the contents
     self.scrollView.contentSize = self.image.size;
     
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    tapRecognizer.numberOfTouchesRequired = 1;
+    [self.scrollView addGestureRecognizer:tapRecognizer];
+    
     UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewDoubleTapped:)];
     doubleTapRecognizer.numberOfTapsRequired = 2;
     doubleTapRecognizer.numberOfTouchesRequired = 1;
     [self.scrollView addGestureRecognizer:doubleTapRecognizer];
+    
+    [tapRecognizer requireGestureRecognizerToFail:doubleTapRecognizer];
     
     UITapGestureRecognizer *twoFingerTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTwoFingerTapped:)];
     twoFingerTapRecognizer.numberOfTapsRequired = 1;
