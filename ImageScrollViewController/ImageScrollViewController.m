@@ -48,8 +48,31 @@
 
 - (void)scrollViewTapped:(UITapGestureRecognizer *)recognizer
 {
-    [[UIApplication sharedApplication] setStatusBarHidden:(!isStatusBarHidden)];
+    if (isStatusBarHidden) {
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+        [self showNavigationBar];
+    } else {
+        [[UIApplication sharedApplication] setStatusBarHidden:YES];
+        [self.navigationController.navigationBar setHidden:YES];
+    }
+    
     isStatusBarHidden = !isStatusBarHidden;
+}
+
+- (void)showNavigationBar
+{
+    [self.navigationController.navigationBar setHidden:NO];
+
+    CGRect rectNavigationBar = self.navigationController.navigationBar.frame;
+    CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
+    CGFloat statusBarHeight = MIN(statusBarFrame.size.height, statusBarFrame.size.width);
+    rectNavigationBar.origin.y = statusBarHeight;
+    self.navigationController.navigationBar.frame = rectNavigationBar;
+}
+
+- (void)hideNavigationBar
+{
+    [self.navigationController.navigationBar setHidden:YES];
 }
 
 - (void)scrollViewDoubleTapped:(UITapGestureRecognizer*)recognizer {
@@ -82,12 +105,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
-    isStatusBarHidden = NO;
-    
     // Set a nice title
-    self.title = @"Image";
-    [self.navigationController setNavigationBarHidden:YES];
+    self.title = @"照片";
+    
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
+    self.navigationController.navigationBar.translucent = YES;
+    isStatusBarHidden = NO;
     
     CGRect rectScrollView;
     rectScrollView.origin.x = 0;
@@ -95,20 +118,15 @@
     rectScrollView.size = self.view.bounds.size;
     rectScrollView.size.height += 20;
     
-    //rectScrollView = [[UIScreen mainScreen] bounds];
-    
     self.scrollView = [[UIScrollView alloc] initWithFrame:rectScrollView];
     self.scrollView.backgroundColor = [UIColor blackColor];
     self.scrollView.autoresizesSubviews = YES;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
-    //self.scrollView.clipsToBounds = YES;
     self.scrollView.delegate = self;
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.scrollView];
     
-    // Set up the image we want to scroll & zoom and add it to the scroll view
-    //UIImage *image = [UIImage imageNamed:@"photo1.png"];
     if (self.image == nil) {
         self.image = [UIImage imageNamed:@"ScrollImage.png"];
     }
@@ -187,20 +205,15 @@
 {
     [super willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
     
-    if (UIDeviceOrientationIsLandscape(toInterfaceOrientation)) {
-        [self.navigationController setNavigationBarHidden:YES];
-        [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    } else {
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-        [self.navigationController setNavigationBarHidden:NO];
-    }
+    //[self.navigationController.navigationBar setHidden:NO];
+    //[[UIApplication sharedApplication] setStatusBarHidden:NO];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-
     [self reinitScrollView];
+
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
 }
 
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)scrollView {
